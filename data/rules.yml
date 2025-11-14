@@ -1,0 +1,17 @@
+version: "3.1"
+
+rules:
+  - rule: Greet the user
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Provide a wellness tip when user expresses mood
+    steps:
+      - intent: mood_express
+      - action: action_give_wellness_tip
+
+  - rule: Say goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye

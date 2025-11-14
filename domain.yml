@@ -1,0 +1,20 @@
+version: "3.1"
+
+intents:
+  - greet
+  - mood_express
+  - goodbye
+
+actions:
+  - action_give_wellness_tip
+
+responses:
+  utter_greet:
+    - text: "Hey there! 🌼 How are you feeling today?"
+
+  utter_goodbye:
+    - text: "Take care of yourself 🌸. Remember, your feelings are valid."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

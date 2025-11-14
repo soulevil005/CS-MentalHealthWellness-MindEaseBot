@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindEase Bot - Mental Wellness Chat</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        #chat-window::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-window::-webkit-scrollbar-thumb {
+            background-color: #d1d5db; /* gray-300 */
+            border-radius: 3px;
+        }
+        #chat-window {
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #d1d5db transparent;
+        }
+    </style>
+    <script>
+        // --- MOOD TIPS AND KEYWORDS (Local Bot Logic) ---
+        const sad_tips = [
+            "It's okay to feel sad 🌧️. Try writing down what’s bothering you — it helps clear the mind.",
+            "Even rainy days pass 🌦️. Take a short walk, breathe deeply, and let yourself rest.",
+            "You’ve overcome hard days before — you’ll do it again 💪.",
+            "Listen to calming music or call someone who makes you smile 💙."
+        ];
+
+        const happy_tips = [
+            "That’s wonderful! 🌞 Keep doing what brings you joy.",
+            "I love hearing that! 💫 Celebrate your happiness and share it with others.",
+            "Keep the positivity flowing 🌻. Maybe spread a little kindness today.",
+            "Happiness looks great on you 😄 — enjoy the moment!"
+        ];
+
+        const anxious_tips = [
+            "It’s okay to feel anxious 🫶. Try breathing in for 4 seconds and out for 6.",
+            "You are safe in this moment 🌿. Focus on something you can see, touch, and hear.",
+            "When your thoughts race, slow them down by grounding yourself — one step at a time.",
+            "Remember, anxiety doesn’t define you. You’re doing your best 🌸."
+        ];
+
+        const stressed_tips = [
+            "Take a deep breath 🌬️. Step away for a few minutes and relax your shoulders.",
+            "Remember to pause — you can’t pour from an empty cup ☕.",
+            "Organize your thoughts, do one thing at a time 💼.",
+            "Even a 5-minute break can refresh your mind 🧘."
+        ];
+
+        const general_tips = [
+            "You are enough, exactly as you are 🌈.",
+            "Be kind to your mind — it’s doing its best 💫.",
+            "Small steps forward still count as progress 🌿.",
+            "Don’t be afraid to rest — your body and mind deserve it 💖.",
+            "Healing takes time. You’re doing great, even if it doesn’t feel like it 🕊️."
+        ];
+
+        const sad_words = ["sad", "down", "depressed", "unhappy", "cry", "lonely", "upset"];
+        const happy_words = ["happy", "excited", "joyful", "good", "great", "amazing"];
+        const anxious_words = ["anxious", "nervous", "worried", "scared", "panic"];
+        const stressed_words = ["stressed", "tired", "exhausted", "pressure", "burnt out"];
+
+        /**
+         * Analyzes the user's message and returns a relevant wellness tip.
+         * @param {string} message 
+         * @returns {string} The bot's response text.
+         */
+        function getBotResponse(message) {
+            const userText = message.toLowerCase();
+            let tipsList = general_tips;
+
+            if (sad_words.some(word => userText.includes(word))) {
+                tipsList = sad_tips;
+            } else if (happy_words.some(word => userText.includes(word))) {
+                tipsList = happy_tips;
+            } else if (anxious_words.some(word => userText.includes(word))) {
+                tipsList = anxious_tips;
+            } else if (stressed_words.some(word => userText.includes(word))) {
+                tipsList = stressed_tips;
+            } else {
+                return "I hear you. If you tell me more about how you're feeling (sad, happy,anxiou, or stressed), I can offer a specific tip. Otherwise, here’s a general thought: " + general_tips[Math.floor(Math.random() * general_tips.length)];
+            }
+            
+            // Return a random tip from the detected category
+            return tipsList[Math.floor(Math.random() * tipsList.length)];
+        }
+        
+        // --- CHAT INTERFACE LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide Icons
+            lucide.createIcons();
+
+            const chatWindow = document.getElementById('chat-window');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            
+            // State variable to track if the bot has been activated by a greeting
+            let isBotActive = false; 
+
+            // Initial prompt for the user
+            addMessage('bot', "Welcome! Say 'hey' or 'hello' to activate MindEaseBot and start our conversation.", 'text-gray-500 font-medium');
+
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            function addMessage(sender, text, classes = '') {
+                const messageDiv = document.createElement('div');
+                const isBot = sender === 'bot';
+
+                // Message Bubble Styling
+                const bubbleClasses = isBot
+                    ? 'bg-gray-100 text-gray-800 rounded-br-2xl'
+                    : 'bg-orange-500 text-white rounded-bl-2xl';
+
+                messageDiv.className = `flex ${isBot ? 'justify-start' : 'justify-end'} mb-4`;
+                messageDiv.innerHTML = `
+                    <div class="max-w-xs md:max-w-md lg:max-w-lg p-3 ${bubbleClasses} rounded-t-2xl shadow-md ${classes}">
+                        ${text}
+                    </div>
+                `;
+                chatWindow.appendChild(messageDiv);
+                // Scroll to the latest message
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            const greetings = ["hey", "hello", "hi", "good morning", "good evening"];
+
+            /**
+             * Checks if the user's message is a simple greeting.
+             */
+            function isGreeting(message) {
+                const normalized = message.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+                return greetings.some(g => normalized === g || normalized.startsWith(g + ' '));
+            }
+
+            function sendMessage() {
+                const userMessage = messageInput.value.trim();
+                if (userMessage === '') return;
+
+                // 1. Display user message
+                addMessage('user', userMessage);
+                messageInput.value = '';
+
+                // 2. Display typing indicator (simulated delay for bot response)
+                const typingIndicatorId = 'typing-' + Date.now();
+                addMessage('bot', `<span id="${typingIndicatorId}">MindEase is thinking...</span>`, 'italic text-gray-500 text-sm');
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    // 3. Remove typing indicator
+                    const typingIndicator = document.getElementById(typingIndicatorId);
+                    if (typingIndicator) {
+                        typingIndicator.parentElement.parentElement.remove();
+                    }
+
+                    let botResponse = "";
+                    let responseClass = '';
+
+                    if (!isBotActive) {
+                        if (isGreeting(userMessage)) {
+                            isBotActive = true;
+                            // Bot's actual welcome/activation message
+                            botResponse = "Hello! I'm MindEase. I'm now active! How are you feeling today?";
+                            responseClass = 'text-orange-700 font-medium'; // Highlight activation message
+                        } else {
+                            // Prompt user to activate
+                            botResponse = "Please start by saying 'hey' or 'hello' to activate MindEase Bot.";
+                            responseClass = 'text-gray-500';
+                        }
+                    } else {
+                        // 4. Get and display local bot response (only if active)
+                        botResponse = getBotResponse(userMessage);
+                    }
+                    
+                    addMessage('bot', botResponse, responseClass);
+                    
+                }, 500); // 500ms delay
+            }
+        });
+    </script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4 font-sans">
+
+    <!-- Chat Container Card -->
+    <div class="w-full max-w-lg h-[80vh] bg-white rounded-3xl shadow-xl flex flex-col overflow-hidden">
+
+        <!-- Chat Header -->
+        <div class="bg-orange-500 text-gray-900 p-4 flex items-center justify-start shadow-md">
+            <div class="p-2 bg-white rounded-full mr-3">
+                <i data-lucide="brain" class="w-6 h-6 text-orange-500"></i>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-xl font-bold">MindEase Bot</h1>
+                <span class="text-xs opacity-80">Ready to chat</span>
+            </div>
+        </div>
+
+        <!-- Chat Window (Messages) -->
+        <div id="chat-window" class="flex-grow p-4 overflow-y-auto space-y-4">
+            <!-- Messages will be injected here by JavaScript -->
+        </div>
+
+        <!-- Message Input -->
+        <div class="p-4 border-t border-gray-200 flex space-x-2">
+            <input type="text" id="message-input" placeholder="Type your message..."
+                   class="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-150"
+                   autocomplete="off">
+            <button id="send-button"
+                    class="bg-orange-500 text-white p-3 rounded-full hover:bg-orange-600 transition duration-150 shadow-lg active:scale-95 transform disabled:opacity-50">
+                <i data-lucide="send" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

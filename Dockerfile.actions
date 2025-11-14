@@ -1,0 +1,14 @@
+# Base Rasa SDK image for actions
+FROM rasa/rasa-sdk:3.6.2
+
+# Copy actions folder
+COPY ./actions /app/actions
+
+# Set working directory
+WORKDIR /app
+
+# Expose SDK port
+EXPOSE 5055
+
+# Run the action server
+CMD ["start", "--actions", "actions"]

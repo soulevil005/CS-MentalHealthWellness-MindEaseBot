@@ -1,0 +1,19 @@
+version: "3.1"
+
+stories:
+- story: greet and express feeling
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: express_feeling
+  - action: action_give_wellness_tip
+
+- story: express feeling directly
+  steps:
+  - intent: express_feeling
+  - action: action_give_wellness_tip
+
+- story: goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
