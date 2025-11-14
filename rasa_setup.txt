@@ -1,0 +1,112 @@
+========================================================
+      RASA INSTALLATION & SETUP GUIDE (MindEase)
+========================================================
+Target Python Version: 3.10.0
+Supports: Windows · macOS · Linux
+========================================================
+
+
+────────────────────────────────────────────────────────
+1. INSTALL PYTHON 3.10.0
+────────────────────────────────────────────────────────
+Download Python 3.10.0 from:
+https://www.python.org/downloads/release/python-3100/
+
+Ensure "Add to PATH" is checked (Windows).
+Verify installation:
+python --version
+
+
+────────────────────────────────────────────────────────
+2. CREATE VIRTUAL ENVIRONMENT
+────────────────────────────────────────────────────────
+
+Windows (PowerShell):
+---------------------
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+Windows (CMD):
+--------------
+python -m venv .venv
+.\.venv\Scripts\activate
+
+macOS / Linux:
+--------------
+python3.10 -m venv .venv
+source .venv/bin/activate
+
+
+────────────────────────────────────────────────────────
+3. UPGRADE PIP & INSTALL DEPENDENCIES
+────────────────────────────────────────────────────────
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+
+
+────────────────────────────────────────────────────────
+4. VERIFY RASA INSTALLATION
+────────────────────────────────────────────────────────
+rasa --version
+
+
+────────────────────────────────────────────────────────
+5. TRAIN THE RASA MODEL
+────────────────────────────────────────────────────────
+# From project root (where config.yml, domain.yml exist):
+rasa train
+
+This generates a trained model inside:
+models/
+
+
+────────────────────────────────────────────────────────
+6. RUN THE CHATBOT
+────────────────────────────────────────────────────────
+
+Run the action server (terminal 1):
+-----------------------------------
+rasa run actions --debug
+
+Run the Rasa server (terminal 2):
+---------------------------------
+rasa run --enable-api --cors "*"
+
+
+────────────────────────────────────────────────────────
+7. TEST THE BOT
+────────────────────────────────────────────────────────
+
+Interactive mode:
+-----------------
+rasa shell
+
+API Test:
+---------
+curl -X POST http://localhost:5005/webhooks/rest/webhook \
+     -H "Content-Type: application/json" \
+     -d '{"sender":"user","message":"hello"}'
+
+
+────────────────────────────────────────────────────────
+8. COMMON FIXES
+────────────────────────────────────────────────────────
+
+If Rasa fails due to cryptography packages:
+-------------------------------------------
+pip install --upgrade cryptography
+
+If TensorFlow fails on macOS:
+-----------------------------
+brew install hdf5
+pip install --no-binary=h5py h5py
+
+If Windows build errors:
+------------------------
+Install Microsoft C++ Build Tools:
+https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+
+────────────────────────────────────────────────────────
+END OF FILE
+────────────────────────────────────────────────────────
