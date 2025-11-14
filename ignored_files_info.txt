@@ -1,0 +1,42 @@
+## 🔒 Files Not Included in This Repository (Important)
+
+Some files and folders are intentionally NOT included in this GitHub project because they are auto-generated, too large, or system-specific.  
+You do NOT need them to run the project.
+
+### These files are NOT required and will not be present:
+
+❌ `.venv/`  
+Python virtual environment (large, system-specific)  
+→ New users must recreate it using: `pip install -r requirements.txt`
+
+❌ `.rasa/`  
+Rasa cache, tracker DB, and temporary files (auto-generated)
+
+❌ `*.keras` / `*.h5` model files  
+Model files are typically large (>100MB)  
+→ New users can retrain using: `rasa train` or your training script
+
+❌ Large datasets  
+Datasets are not stored on GitHub.  
+→ Users must download them separately (instructions provided)
+
+❌ System folders like `.config/`, `.idea/`, `.vscode/`  
+These are personal environment configs.
+
+---
+
+### ✔ What users SHOULD download from GitHub:
+- All **code files** (`.py`)
+- All **Rasa config files** (`config.yml`, `domain.yml`)
+- All **training data** (`nlu.yml`, `stories.yml`, `rules.yml`)
+- **Dockerfile** & `docker-compose.yml`
+- **actions/** folder
+- **requirements.txt**
+- **README.md**
+
+After cloning, users just run:
+pip install -r requirements.txt
+rasa train
+
+
+Everything else is auto-created.
