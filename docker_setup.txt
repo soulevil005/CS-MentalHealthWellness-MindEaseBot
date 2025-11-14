@@ -1,0 +1,142 @@
+=========================================================
+        DOCKER + DOCKER COMPOSE SETUP (MindEase)
+=========================================================
+Supported OS: Windows · macOS · Linux (Ubuntu/Debian)
+=========================================================
+
+
+─────────────────────────────────────────────────────────
+1. INSTALL DOCKER
+─────────────────────────────────────────────────────────
+
+Windows 10/11:
+--------------
+Install Docker Desktop:
+https://www.docker.com/products/docker-desktop/
+
+Enable:
+- WSL2 backend
+- Integration for Ubuntu (if using WSL)
+
+macOS (Intel/M1/M2):
+--------------------
+Install Docker Desktop for macOS:
+https://www.docker.com/products/docker-desktop/
+
+Linux (Ubuntu Example):
+-----------------------
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+# Add Docker’s official GPG key:
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+sudo gpg --dearmor -o /usr/share/keyrings/docker.gpg
+
+# Add Docker repo:
+echo \
+  "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/usr/share/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install engine + compose:
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Allow running Docker without sudo:
+sudo usermod -aG docker $USER
+# logout & login again
+
+
+─────────────────────────────────────────────────────────
+2. VERIFY INSTALLATION
+─────────────────────────────────────────────────────────
+docker --version
+docker compose version    # or: docker-compose --version
+
+
+─────────────────────────────────────────────────────────
+3. BUILD & RUN MINDEASE WITH DOCKER
+─────────────────────────────────────────────────────────
+
+From project root where Dockerfile + docker-compose.yml exist:
+
+Build & start:
+--------------
+docker compose up --build
+
+This starts:
+- Rasa server → http://localhost:5005
+- Action server → http://localhost:5055
+
+Stop the containers:
+--------------------
+docker compose down
+
+
+─────────────────────────────────────────────────────────
+4. FILES USED BY DOCKER
+─────────────────────────────────────────────────────────
+
+Dockerfile
+----------
+FROM rasa/rasa:3.6.0-full
+WORKDIR /app
+COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 5005
+CMD ["rasa", "run", "--enable-api", "--cors", "*"]
+
+docker-compose.yml
+------------------
+version: "3.9"
+
+services:
+  rasa:
+    build: .
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./:/app
+    depends_on:
+      - action_server
+
+  action_server:
+    image: rasa/rasa-sdk:3.6.0
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./actions:/app/actions
+
+
+─────────────────────────────────────────────────────────
+5. COMMON DOCKER FIXES
+─────────────────────────────────────────────────────────
+
+Port already in use:
+--------------------
+Change ports in docker-compose.yml
+
+WSL2 not running (Windows):
+---------------------------
+wsl --set-default-version 2
+wsl --install
+
+macOS M1/M2 TensorFlow issues:
+------------------------------
+Use CPU version of TensorFlow (already included)
+
+Permission denied when running Docker on Linux:
+-----------------------------------------------
+sudo usermod -aG docker $USER
+logout + login
+
+
+─────────────────────────────────────────────────────────
+END OF FILE
+─────────────────────────────────────────────────────────
