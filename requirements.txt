@@ -1,0 +1,45 @@
+# MindEase - Conversational Mental Health Chatbot
+# Python Version: 3.10.0
+# All dependencies pinned for stability and reproducibility.
+
+###############
+# CORE RASA
+###############
+rasa==3.6.0
+rasa-sdk==3.6.0
+
+###############
+# ML / NLP
+###############
+# TensorFlow (if used; compatible with Python 3.10)
+tensorflow==2.12.0
+
+# Classic ML utilities
+scikit-learn==1.2.2
+numpy==1.24.3
+scipy==1.10.1
+
+###############
+# WEB / RUNTIME
+###############
+requests==2.31.0
+aiohttp==3.8.4
+ujson==5.8.0
+python-dotenv==1.0.0
+
+###############
+# LOGGING / DEBUG
+###############
+coloredlogs==15.0.1
+
+###############
+# OPTIONAL TESTING
+###############
+pytest==7.4.0
+
+###############
+# NOTES:
+# If you switch to a PyTorch-based NLU model in custom actions:
+# torch==2.2.0
+# torchvision==0.18.1
+###############
